@@ -3,6 +3,8 @@ from itertools import zip_longest
 from numbers import Real
 from typing import Any, Union
 
+from toolbox.helpers import Equation
+
 __all__ = ["Vector", "Point2D", "Point3D", "VectorLine", "dot", "is_vector"]
 
 
@@ -135,14 +137,24 @@ class __VectorLine:
     def __init__(self, a: Vector, b: Vector):
         self.p = a
         self.u = b - a
-        self.components = tuple(lambda t: a+b*t for a,b in zip(self.p.components, self.u.components))
+        self.components = self.__get_components()
 
     def __call__(self, t: Real):
         return self.p + self.u * t
 
-    def __format_equations(self):
-        equations = [f"{a}{'+' if b >= 0 else '-'}{abs(b)}t" for a, b in zip(self.p.components, self.u.components)]
-        return equations
+    def __get_components(self):
+        components = []
+        for a, b in zip(self.p.components, self.u.components):
+            key = f"{a}{'+' if b >= 0 else '-'}{abs(b)}t"
+
+            def closure(a: Real, b: Real):
+                def value(t: Real):
+                    return a + (b * t)
+                return value
+
+            equation = Equation(key, closure(a, b))
+            components.append(equation)
+        return tuple(components)
 
 
 class VectorLine(__VectorLine):
@@ -159,14 +171,16 @@ class VectorLine(__VectorLine):
 
 
 class VectorLine2D(__VectorLine):
+    # noinspection PyUnresolvedReferences
     def __repr__(self):
-        equations = self.__format_equations()
+        equations = self._VectorLine__get_components()
         return f"VectorLine(x={equations[0]}, y={equations[1]})"
 
 
 class VectorLine3D(__VectorLine):
+    # noinspection PyUnresolvedReferences
     def __repr__(self):
-        equations = self.__format_equations()
+        equations = self._VectorLine__get_components()
         return f"VectorLine(x={equations[0]}, y={equations[1]}, z={equations[2]})"
 
 
