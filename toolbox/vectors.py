@@ -131,6 +131,45 @@ class Point3D(__Vector):
         )
 
 
+class __VectorLine:
+    def __init__(self, a: Vector, b: Vector):
+        self.p = a
+        self.u = b - a
+        self.components = tuple(lambda t: a+b*t for a,b in zip(self.p.components, self.u.components))
+
+    def __call__(self, t: Real):
+        return self.p + self.u * t
+
+    def __format_equations(self):
+        equations = [f"{a}{'+' if b >= 0 else '-'}{abs(b)}t" for a, b in zip(self.p.components, self.u.components)]
+        return equations
+
+
+class VectorLine(__VectorLine):
+    def __new__(cls, a: Vector, b: Vector):
+        if len(a) != len(b):
+            raise ValueError(f"Vector dimensions are different. {len(a)} != {len(b)}")
+        dimensions = len(a)
+
+        if dimensions == 2:
+            return VectorLine2D(a, b)
+        elif dimensions == 3:
+            return VectorLine3D(a, b)
+        return super().__new__(cls)
+
+
+class VectorLine2D(__VectorLine):
+    def __repr__(self):
+        equations = self.__format_equations()
+        return f"VectorLine(x={equations[0]}, y={equations[1]})"
+
+
+class VectorLine3D(__VectorLine):
+    def __repr__(self):
+        equations = self.__format_equations()
+        return f"VectorLine(x={equations[0]}, y={equations[1]}, z={equations[2]})"
+
+
 def dot(a: __Vector, b: __Vector) -> Real:
     """Return the dot product of two vectors"""
     return sum([a * b for a, b in zip_longest(a.components, b.components, fillvalue=0)])
