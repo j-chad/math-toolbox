@@ -7,6 +7,7 @@ Currently only contains a vector library but hopefully more will be added throug
 If you would like to contribute or have any ideas please email me (address is on my profile.) or raise an issue. Pull requests are welcome!
 
 ## Usage
+Tested on python 3.7.2. May or may not work on other 3.x.x releases.
 ```python
 >>> from toolbox.vectors import Vector
 
