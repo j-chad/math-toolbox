@@ -1,9 +1,10 @@
 import math
+from functools import singledispatch
 from itertools import zip_longest
 from numbers import Real
 from typing import Any, Union
 
-from toolbox.helpers import Equation
+from toolbox.helpers import Equation, method_dispatch
 
 __all__ = ["Vector", "Point2D", "Point3D", "VectorLine", "dot", "is_vector"]
 
@@ -34,6 +35,7 @@ class _Vector:
             return Vector(*[a - b for a, b in zip_longest(self.components, other.components, fillvalue=0)])
         return NotImplemented
 
+    @method_dispatch
     def __mul__(self, other: Union[Real, "_Vector"]) -> Union[Real, "_Vector"]:
         """Defines a scalar or dot multiplication, depending on the operands."""
         if is_vector(other):
@@ -150,12 +152,25 @@ class _VectorLine:
             def closure(a: Real, b: Real):
                 def value(t: Real):
                     return a + (b * t)
-
                 return value
+            value_ = closure(a, b)
 
-            equation = Equation(key, closure(a, b))
+            equation = Equation(key, value_)
             components.append(equation)
         return tuple(components)
+
+    @method_dispatch
+    def intersects(self, shape: Any):
+        if not isinstance(shape, self.__class__):
+            return NotImplemented
+        else:
+            if len(shape.components) != len(self.components):
+                return NotImplemented
+
+    @intersects.register
+    def _(self, shape: _Vector):
+        if len(shape.components) != len(self.components):
+            return NotImplemented
 
 
 class VectorLine(_VectorLine):
