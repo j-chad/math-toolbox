@@ -36,6 +36,9 @@ Vector(x=3, y=6)
 # dot product
 >>> u * Vector(7, 3)
 13
+# or
+>>> dot(u, Vector(7, 3))
+13
 
 # cross product
 >>> a = Vector(4, 7, 2)
