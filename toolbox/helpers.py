@@ -1,12 +1,11 @@
 from collections import Callable
+from functools import singledispatch, update_wrapper
 
 
 class Equation:
     def __init__(self, key: str, value: Callable):
         self.key = key
         self.__value = value
-
-        self.__update_wrapper()
 
     def __call__(self, *args, **kwargs):
         return self.__value(*args, **kwargs)
@@ -17,7 +16,13 @@ class Equation:
     def __repr__(self):
         return f"Equation({self.key})"
 
-    # noinspection PyUnresolvedReferences
-    def __update_wrapper(self):
-        self.__call__.__annotations__ = self.__value.__annotations__
-        self.__call__.__doc__ = self.__value.__doc__
+
+def method_dispatch(func):
+    dispatcher = singledispatch(func)
+
+    def wrapper(*args, **kw):
+        return dispatcher.dispatch(args[1].__class__)(*args, **kw)
+
+    wrapper.register = dispatcher.register
+    update_wrapper(wrapper, func)
+    return wrapper
