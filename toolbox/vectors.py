@@ -16,6 +16,12 @@ class __Vector:
     def __init__(self, *args: Real):
         self.components = args
 
+    def __repr__(self):
+        return f"Vector({', '.join(str(i) for i in self.components)})"
+
+    def __len__(self):
+        return len(self.components)
+
     def __add__(self, other: "__Vector") -> "__Vector":
         if is_vector(other):
             return Vector(*[a + b for a, b in zip_longest(self.components, other.components, fillvalue=0)])
@@ -37,9 +43,6 @@ class __Vector:
     def __rmul__(self, other: Union[Real, "__Vector"]) -> Union[Real, "__Vector"]:
         """Returns the same result as __mul__ since scalar multiplication and dot multiplication are both commutative operations"""
         return self.__mul__(other)
-
-    def __repr__(self):
-        return f"Vector({', '.join(str(i) for i in self.components)})"
 
     def __eq__(self, other: "__Vector") -> bool:
         if is_vector(other):
