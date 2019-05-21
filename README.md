@@ -29,6 +29,10 @@ Tested on python 3.7.2. May or may not work on other 3.x.x releases.
 >>> u.magnitude
 2.236...
 
+# angle (relative to x axis)
+>>> u.angle
+0.463...
+
 # scalar multiplication
 >>> u * 3
 Vector(x=3, y=6)
