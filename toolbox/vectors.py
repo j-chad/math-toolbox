@@ -92,7 +92,7 @@ class Point3D(__Vector):
         return self.components[2]
 
     def cross(self, b: "Point3D") -> "Point3D":
-        return Vector(
+        return Point3D(
             ((self.y * b.z) - (self.z * b.y)),
             ((self.z * b.x) - (self.x * b.z)),
             ((self.x * b.y) - (self.y * b.x))
