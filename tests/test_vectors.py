@@ -1,7 +1,8 @@
 import unittest
 from math import pi, sqrt
 
-from toolbox.vectors.vectors import Point2D, Point3D, Vector, _Vector
+from toolbox.vectors import Point2D, Point3D, Vector
+from toolbox.vectors._vectors import _Vector
 from toolbox.vectors.shapes import VectorLine, VectorLine2D, VectorLine3D, PointIntersection
 
 

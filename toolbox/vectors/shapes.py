@@ -3,7 +3,7 @@ from numbers import Real
 from typing import Any, Optional, Tuple
 
 from .helpers import Equation, method_dispatch
-from .vectors import Vector, _Shape, _Vector
+from ._vectors import Vector, _Shape, _Vector
 
 __all__ = ["VectorLine", "VectorLine2D", "VectorLine3D"]
 

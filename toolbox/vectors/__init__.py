@@ -1,3 +1,3 @@
 """Library for vectors + related shapes and operations"""
 
-from .vectors import *
+from ._vectors import *

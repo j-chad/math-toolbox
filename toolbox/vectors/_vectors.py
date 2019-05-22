@@ -3,8 +3,6 @@ from itertools import zip_longest
 from numbers import Real
 from typing import Any, Optional, Union
 
-from .helpers import method_dispatch
-
 __all__ = ["Vector", "Point2D", "Point3D", "dot", "is_vector"]
 
 
@@ -65,7 +63,7 @@ class _Vector(_Shape):
 
     def __truediv__(self, other):
         if isinstance(other, Real):
-            return Vector(*[a/other for a in self.components])
+            return Vector(*[a / other for a in self.components])
         return NotImplemented
 
     def __rmul__(self, other: Union[Real, "_Vector"]) -> Union[Real, "_Vector"]:
