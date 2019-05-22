@@ -55,13 +55,17 @@ class _Vector(_Shape):
             return Vector(*[a - b for a, b in zip_longest(self.components, other.components, fillvalue=0)])
         return NotImplemented
 
-    @method_dispatch
     def __mul__(self, other: Union[Real, "_Vector"]) -> Union[Real, "_Vector"]:
         """Defines a scalar or dot multiplication, depending on the operands."""
         if is_vector(other):
             return dot(self, other)
         elif isinstance(other, Real):
             return Vector(*[other * a for a in self.components])
+        return NotImplemented
+
+    def __truediv__(self, other):
+        if isinstance(other, Real):
+            return Vector(*[a/other for a in self.components])
         return NotImplemented
 
     def __rmul__(self, other: Union[Real, "_Vector"]) -> Union[Real, "_Vector"]:

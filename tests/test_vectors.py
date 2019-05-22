@@ -36,6 +36,10 @@ class TestVector(unittest.TestCase):
         self.assertEqual(u * 3, _Vector(6, 21, 12))
         self.assertEqual(3 * u, _Vector(6, 21, 12))
 
+    def test_scalar_division(self):
+        u = _Vector(2, 8, 4)
+        self.assertEqual(u / 2, _Vector(1, 4, 2))
+
     def test_dot_multiplication(self):
         u = _Vector(2, 7, 4)
         v = _Vector(5, 8, 2)
