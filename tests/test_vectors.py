@@ -1,7 +1,8 @@
 import unittest
 from math import pi, sqrt
 
-from toolbox.vectors import Point2D, Point3D, PointIntersection, Vector, VectorLine, VectorLine2D, VectorLine3D, _Vector
+from toolbox.vectors.vectors import Point2D, Point3D, Vector, _Vector
+from toolbox.vectors.shapes import VectorLine, VectorLine2D, VectorLine3D, PointIntersection
 
 
 class TestVector(unittest.TestCase):
