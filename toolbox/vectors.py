@@ -1,5 +1,5 @@
 import math
-from functools import singledispatch
+from dataclasses import dataclass
 from itertools import zip_longest
 from numbers import Real
 from typing import Any, Union
@@ -144,6 +144,30 @@ class _VectorLine:
     def __call__(self, t: Real):
         return self.p + self.u * t
 
+    @method_dispatch
+    def __intersect__(self, shape: Any):
+        if not isinstance(shape, self.__class__):
+            return NotImplemented
+        else:
+            if len(shape.components) != len(self.components):
+                return NotImplemented
+
+    @__intersect__.register
+    def _(self, shape: _Vector):
+        if len(shape.components) != len(self.components):
+            return NotImplemented
+        for i, b in enumerate(self.u.components):
+            if b != 0:
+                t = (shape.components[i] - self.p.components[i]) / b
+                break
+        else:
+            t = 0
+        point = Vector(*(i(t) for i in self.components))
+        if shape == point:
+            return PointIntersection(a=self, b=shape, point=point)
+        else:
+            return None
+
     def __get_components(self):
         components = []
         for a, b in zip(self.p.components, self.u.components):
@@ -152,25 +176,26 @@ class _VectorLine:
             def closure(a: Real, b: Real):
                 def value(t: Real):
                     return a + (b * t)
+
                 return value
+
             value_ = closure(a, b)
 
             equation = Equation(key, value_)
             components.append(equation)
         return tuple(components)
 
-    @method_dispatch
     def intersects(self, shape: Any):
-        if not isinstance(shape, self.__class__):
-            return NotImplemented
-        else:
-            if len(shape.components) != len(self.components):
-                return NotImplemented
-
-    @intersects.register
-    def _(self, shape: _Vector):
-        if len(shape.components) != len(self.components):
-            return NotImplemented
+        intersect = self.__intersect__(shape)
+        if intersect is NotImplemented:
+            __r_intersect__ = getattr(shape, "__intersect__", None)
+            if __r_intersect__ is None:
+                raise TypeError(f"unsupported types for intersect: '{self.__class__.__name__}' and '{shape.__class__.__name__}'")
+            else:
+                intersect = __r_intersect__(self)
+                if intersect is NotImplemented:
+                    raise TypeError(f"unsupported types for intersect: '{self.__class__.__name__}' and '{shape.__class__.__name__}'")
+        return intersect
 
 
 class VectorLine(_VectorLine):
@@ -198,6 +223,13 @@ class VectorLine3D(_VectorLine):
     def __repr__(self):
         equations = self._VectorLine__get_components()
         return f"VectorLine(x={equations[0]}, y={equations[1]}, z={equations[2]})"
+
+
+@dataclass
+class PointIntersection:
+    a: Any
+    b: Any
+    point: _Vector
 
 
 def dot(a: _Vector, b: _Vector) -> Real:
