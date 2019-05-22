@@ -78,6 +78,10 @@ class _Vector(_Shape):
         return NotImplemented
 
     @property
+    def unit_vector(self):
+        return self / self.magnitude
+
+    @property
     def magnitude(self) -> Real:
         return math.sqrt(sum([i ** 2 for i in self.components]))
 
