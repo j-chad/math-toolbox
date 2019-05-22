@@ -1,8 +1,7 @@
 import math
-from dataclasses import dataclass
 from itertools import zip_longest
 from numbers import Real
-from typing import Any, Union
+from typing import Any, Optional, Union
 
 from .helpers import method_dispatch
 
@@ -10,10 +9,14 @@ __all__ = ["Vector", "Point2D", "Point3D", "dot", "is_vector"]
 
 
 class _Shape:
-    def __intersect__(self, shape: "_Shape"):
+    def __intersect__(self, shape: "_Shape") -> Optional["PointIntersection"]:
         return NotImplemented
 
     def intersect(self, shape: "_Shape"):
+        """Returns the intersection points with a second shape.
+
+        If the shapes do not intersect, None is returned.
+        """
         intersect = self.__intersect__(shape)
         if intersect is NotImplemented:
             __r_intersect__ = getattr(shape, "__intersect__", None)

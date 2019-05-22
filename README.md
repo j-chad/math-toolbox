@@ -6,6 +6,12 @@ Currently only contains a vector library but hopefully more will be added throug
 ## Contributing
 If you would like to contribute or have any ideas please email me (address is on my profile.) or raise an issue. Pull requests are welcome!
 
+## Features
+* All basic Vector operations
+* Vector Lines
+* Intersection between lines and points
+* Intersection between 2D lines
+
 ## Usage
 Tested on python 3.7.2. May or may not work on other 3.x.x releases.
 ```python

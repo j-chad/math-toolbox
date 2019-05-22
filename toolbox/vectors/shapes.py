@@ -1,6 +1,6 @@
 from dataclasses import dataclass
 from numbers import Real
-from typing import Any, Tuple
+from typing import Any, Optional, Tuple
 
 from .helpers import Equation, method_dispatch
 from .vectors import Vector, _Shape, _Vector
@@ -8,7 +8,16 @@ from .vectors import Vector, _Shape, _Vector
 __all__ = ["VectorLine", "VectorLine2D", "VectorLine3D"]
 
 
+@dataclass
+class PointIntersection:
+    a: Any
+    b: Any
+    point: _Vector
+
+
 class _VectorLine(_Shape):
+    """A line that is described using 2 Vectors"""
+
     def __init__(self, a: _Vector, b: _Vector):
         self.p = a
         self.u = b - a
@@ -17,7 +26,7 @@ class _VectorLine(_Shape):
     def __call__(self, t: Real):
         return self.p + self.u * t
 
-    def __intersect__(self, shape: _Vector):
+    def __intersect__(self, shape: _Vector) -> Optional[PointIntersection]:
         if not isinstance(shape, _Vector):
             return NotImplemented
 
@@ -36,6 +45,7 @@ class _VectorLine(_Shape):
             return None
 
     def __get_components(self) -> Tuple[Equation]:
+        """Creates Equation types to use for components"""
         components = []
         for a, b in zip(self.p.components, self.u.components):
             key = f"{a}{'+' if b >= 0 else '-'}{abs(b)}t"
@@ -111,10 +121,3 @@ class VectorLine3D(_VectorLine):
     def __repr__(self):
         equations = self._VectorLine__get_components()
         return f"VectorLine(x={equations[0]}, y={equations[1]}, z={equations[2]})"
-
-
-@dataclass
-class PointIntersection:
-    a: Any
-    b: Any
-    point: _Vector
