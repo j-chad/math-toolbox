@@ -2,14 +2,31 @@ import math
 from dataclasses import dataclass
 from itertools import zip_longest
 from numbers import Real
-from typing import Any, Union
+from typing import Any, Tuple, Union
 
 from toolbox.helpers import Equation, method_dispatch
 
-__all__ = ["Vector", "Point2D", "Point3D", "VectorLine", "dot", "is_vector"]
+__all__ = ["Vector", "Point2D", "Point3D", "VectorLine", "VectorLine3D", "VectorLine2D", "dot", "is_vector"]
 
 
-class _Vector:
+class _Shape:
+    def __intersect__(self, shape: "_Shape"):
+        return NotImplemented
+
+    def intersect(self, shape: "_Shape"):
+        intersect = self.__intersect__(shape)
+        if intersect is NotImplemented:
+            __r_intersect__ = getattr(shape, "__intersect__", None)
+            if __r_intersect__ is None:
+                raise TypeError(f"unsupported types for intersect: '{self.__class__.__name__}' and '{shape.__class__.__name__}'")
+            else:
+                intersect = __r_intersect__(self)
+                if intersect is NotImplemented:
+                    raise TypeError(f"unsupported types for intersect: '{self.__class__.__name__}' and '{shape.__class__.__name__}'")
+        return intersect
+
+
+class _Vector(_Shape):
     """The base Vector type.
 
     Will usually be created using the Vector class and is valid for any dimension.
@@ -135,7 +152,7 @@ class Point3D(_Vector):
         )
 
 
-class _VectorLine:
+class _VectorLine(_Shape):
     def __init__(self, a: _Vector, b: _Vector):
         self.p = a
         self.u = b - a
@@ -144,16 +161,10 @@ class _VectorLine:
     def __call__(self, t: Real):
         return self.p + self.u * t
 
-    @method_dispatch
-    def __intersect__(self, shape: Any):
-        if not isinstance(shape, self.__class__):
+    def __intersect__(self, shape: _Vector):
+        if not isinstance(shape, _Vector):
             return NotImplemented
-        else:
-            if len(shape.components) != len(self.components):
-                return NotImplemented
 
-    @__intersect__.register
-    def _(self, shape: _Vector):
         if len(shape.components) != len(self.components):
             return NotImplemented
         for i, b in enumerate(self.u.components):
@@ -168,7 +179,7 @@ class _VectorLine:
         else:
             return None
 
-    def __get_components(self):
+    def __get_components(self) -> Tuple[Equation]:
         components = []
         for a, b in zip(self.p.components, self.u.components):
             key = f"{a}{'+' if b >= 0 else '-'}{abs(b)}t"
@@ -184,18 +195,6 @@ class _VectorLine:
             equation = Equation(key, value_)
             components.append(equation)
         return tuple(components)
-
-    def intersects(self, shape: Any):
-        intersect = self.__intersect__(shape)
-        if intersect is NotImplemented:
-            __r_intersect__ = getattr(shape, "__intersect__", None)
-            if __r_intersect__ is None:
-                raise TypeError(f"unsupported types for intersect: '{self.__class__.__name__}' and '{shape.__class__.__name__}'")
-            else:
-                intersect = __r_intersect__(self)
-                if intersect is NotImplemented:
-                    raise TypeError(f"unsupported types for intersect: '{self.__class__.__name__}' and '{shape.__class__.__name__}'")
-        return intersect
 
 
 class VectorLine(_VectorLine):
@@ -216,6 +215,39 @@ class VectorLine2D(_VectorLine):
     def __repr__(self):
         equations = self._VectorLine__get_components()
         return f"VectorLine(x={equations[0]}, y={equations[1]})"
+
+    @method_dispatch
+    def __intersect__(self, shape: _Shape):
+        if not isinstance(shape, self.__class__):
+            return NotImplemented
+        else:
+            if len(shape.components) != len(self.components):
+                return NotImplemented
+
+            determinant = self.u.components[0] * -shape.u.components[1] - self.u.components[1] * -shape.u.components[0]
+
+            if determinant == 0:  # Parallel Lines
+                return None
+
+            difference = (shape.p - self.p)
+            determinant_a = difference.components[0] * -shape.u.components[1] - difference.components[1] * -shape.u.components[0]
+            determinant_b = self.u.components[0] * difference.components[1] - self.u.components[1] * difference.components[0]
+            a = determinant_a / determinant
+            b = determinant_b / determinant
+
+            x1 = self.components[0](a)
+            x2 = shape.components[0](b)
+            y1 = self.components[1](a)
+            y2 = shape.components[1](b)
+
+            assert x1 == x2
+            assert y1 == y2
+
+            return PointIntersection(a=self, b=shape, point=Vector(x1, y1))
+
+    @__intersect__.register
+    def _(self, shape: _Vector):
+        return super().__intersect__(shape)
 
 
 class VectorLine3D(_VectorLine):

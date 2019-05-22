@@ -1,7 +1,7 @@
 import unittest
 from math import pi, sqrt
 
-from toolbox.vectors import _Vector, Vector, VectorLine, Point3D, Point2D, VectorLine2D, VectorLine3D
+from toolbox.vectors import Point2D, Point3D, PointIntersection, Vector, VectorLine, VectorLine2D, VectorLine3D, _Vector
 
 
 class TestVector(unittest.TestCase):
@@ -89,6 +89,30 @@ class TestVectorLine(unittest.TestCase):
         with self.assertRaises(ValueError):
             VectorLine(Vector(2, 7, 4), Vector(5, 8))
 
-    def test_intercept_parallel_line(self):
-        u = VectorLine(Vector(1,1), Vector(2,0))
+    def test_intercept_point_on_line(self):
+        u = VectorLine(Vector(1, 1), Vector(2, 0))
+        v = Vector(3, -1)
+        intercept = u.intersect(v)
+        self.assertIsInstance(intercept, PointIntersection)
+        self.assertEqual(intercept.point, Vector(3, -1))
+        self.assertEqual(intercept.point, v.intersect(u).point)
+
+    def test_intercept_point_outside_line(self):
+        u = VectorLine(Vector(0, 0), Vector(2, -2))
+        v = Vector(3, -1)
+        self.assertIsNone(u.intersect(v))
+        self.assertIsNone(v.intersect(u))
+
+    def test_intercept_parallel_line_2d(self):
+        u = VectorLine(Vector(1, 1), Vector(2, 0))
         v = VectorLine(Vector(0, 0), Vector(2, -2))
+        self.assertIsNone(u.intersect(v))
+        self.assertIsNone(v.intersect(u))
+
+    def test_intercept_lines_2d(self):
+        u = VectorLine(Vector(0, 3), Vector(2, -1))
+        v = VectorLine(Vector(0, 0), Vector(1, -1))
+        intercept = u.intersect(v)
+        self.assertIsInstance(intercept, PointIntersection)
+        self.assertEqual(intercept.point, Vector(3, -3))
+        self.assertEqual(intercept.point, v.intersect(u).point)
