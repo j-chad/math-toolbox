@@ -12,6 +12,12 @@ If you would like to contribute or have any ideas please email me (address is on
 * Intersection between lines and points
 * Intersection between 2D lines
 
+## Planned Features
+* Matrices
+* Vector Planes
+* Intersection with higher dimension VectorLines
+* A way to not fail the exam
+
 ## Usage
 Tested on python 3.7.2. May or may not work on other 3.x.x releases.
 ```python
