@@ -19,10 +19,10 @@ class _Vector:
     def __init__(self, *args: Real):
         self.components = args
 
-    def __repr__(self):
+    def __repr__(self) -> str:
         return f"Vector({', '.join(str(i) for i in self.components)})"
 
-    def __len__(self):
+    def __len__(self) -> int:
         return len(self.components)
 
     def __add__(self, other: "_Vector") -> "_Vector":
@@ -79,8 +79,8 @@ class Point2D(_Vector):
     Adds niceties such as x and y accessors as well as an angle property.
     """
 
-    def __init__(self, i: Real, j: Real):
-        super().__init__(i, j)
+    def __init__(self, x: Real, y: Real):
+        super().__init__(x, y)
 
     def __repr__(self):
         return f"Vector(x={self.x}, y={self.y})"
@@ -105,8 +105,8 @@ class Point3D(_Vector):
         Adds niceties such as x, y and z accessors as well as a cross multiplication function.
     """
 
-    def __init__(self, i: Real, j: Real, k: Real):
-        super().__init__(i, j, k)
+    def __init__(self, x: Real, y: Real, z: Real):
+        super().__init__(x, y, z)
 
     def __repr__(self):
         return f"Vector(x={self.x}, y={self.y}, z={self.z})"
@@ -136,7 +136,7 @@ class Point3D(_Vector):
 
 
 class _VectorLine:
-    def __init__(self, a: Vector, b: Vector):
+    def __init__(self, a: _Vector, b: _Vector):
         self.p = a
         self.u = b - a
         self.components = self.__get_components()
@@ -174,7 +174,7 @@ class _VectorLine:
 
 
 class VectorLine(_VectorLine):
-    def __new__(cls, a: Vector, b: Vector):
+    def __new__(cls, a: _Vector, b: _Vector):
         if len(a) != len(b):
             raise ValueError(f"Vector dimensions are different. {len(a)} != {len(b)}")
         dimensions = len(a)
